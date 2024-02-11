@@ -1,0 +1,18 @@
+{
+    "name": "Cosmic.GG.Atmosphere",
+    "rootNamespace": "",
+    "references": [
+        "GUID:86cb503834695a44194ef481398ba5e8",
+        "GUID:570dd93a3b49da0419be9eb2f9701a38",
+        "GUID:8f7bbbeefa5b54564815f74a79ebbf9d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

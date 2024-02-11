@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: da102abc2edbd42ada99e77d1407a0eb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - compOrbCalc: {fileID: 7200000, guid: 34d83d9bdc44e4bdf8e5a19dc8f567dc, type: 3}
+  - compVecAdd: {fileID: 7200000, guid: 269e238d35b144c1e907159293dcb37a, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

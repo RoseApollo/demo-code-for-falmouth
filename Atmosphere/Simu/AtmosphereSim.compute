@@ -1,0 +1,162 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CalculateDensity
+#pragma kernel CalculateForces
+
+// planet x
+// effect y
+
+struct AtmoPlanet
+{
+    float3 position;
+
+    float seaLevel;
+
+    float seaLevelPressure;
+    float temperature;
+    float molarMass;
+    float relativeHumidity;
+    float dewPoint;
+};
+
+struct AtmoEffect
+{
+    float3 position;
+    float3 velocity;
+
+    float radius;
+
+    float gravity;
+};
+
+//in
+RWStructuredBuffer<AtmoPlanet> planets;
+RWStructuredBuffer<AtmoEffect> objects;
+
+int planetsLen;
+int objectsLen;
+
+//inout
+RWStructuredBuffer<float> densities;
+
+//out
+RWStructuredBuffer<float3> results;
+
+// funcs
+
+float MakePositive(float a)
+{
+    if (a > 0)
+    {
+        return a;
+    }
+
+    return -a;
+}
+
+float Clamp(float v, float min, float max)
+{
+    if (v < min)
+    {
+        return min;
+    }
+
+    if (v > max)
+    {
+        return max;
+    }
+
+    return v;
+}
+
+float BPow(float a, float b)
+{
+    if (a < 0)
+    {
+        return -pow(-a, b);
+    }
+
+    return pow(a, b);
+}
+
+bool VectorsEqual(float3 a, float3 b)
+{
+    if (a.x == b.x)
+    {
+        if (a.y == b.y)
+        {
+            if (a.z == b.z)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+float Magnitude(float3 a)
+{
+    return (a.x * a.x) + (a.y * a.y) + (a.z * a.z);
+}
+
+float GetAtmoPressure(float alt, float seaLevelPressure, float temp, float gravity, float molarMass)
+{
+    float result = gravity * molarMass * alt;
+    result /= molarMass * temp;
+    result *= seaLevelPressure * 2.71828182846;
+
+    return result;
+}
+
+float GetAtmoDensity(float pressure, float temp, float relativeHumidity, float dewPoint)
+{
+    float avp = relativeHumidity * (6.1078 * 10 * ((7.5 * temp) / (temp + 237.3)));
+    float dp = pressure - avp;
+
+    float density = (dp / (287.058 * temp)) + (avp / (461.495 * temp));
+
+    return density;
+}
+
+float3 GetAirResitanceSphere(float density, float3 velocity, float radius)
+{
+    float area = 3.1415926538 * radius * radius;
+    float v = Magnitude(velocity);
+
+    float force = density * v * v * 0.47 * area;
+    force /= 2;
+
+    return -(force * normalize(velocity));
+}
+
+[numthreads(1,1,1)]
+void CalculateDensity (uint3 id : SV_DispatchThreadID)
+{
+    float altitude = distance(planets[id.x].position, objects[id.y].position) - planets[id.x].seaLevel;
+
+    if (altitude < 0)
+    {
+        altitude = 0;
+    }
+
+    float pressure = GetAtmoPressure(altitude, planets[id.x].seaLevelPressure, planets[id.x].temperature, objects[id.y].gravity, planets[id.x].molarMass);
+
+    float density = GetAtmoDensity(pressure, planets[id.x].temperature, planets[id.x].relativeHumidity, planets[id.x].dewPoint);
+
+    densities[(id.x * objectsLen) + id.y] = density;
+}
+
+[numthreads(1,1,1)]
+void CalculateForces (uint3 id : SV_DispatchThreadID)
+{
+    float density = 0;
+
+    for (int i = 0; i < objectsLen; i++)
+    {
+        density += densities[(i * objectsLen) + id.x];
+    }
+
+    float3 ar = GetAirResitanceSphere(density, objects[id.x].velocity, objects[id.x].radius);
+
+    results[id.x] = ar;
+}

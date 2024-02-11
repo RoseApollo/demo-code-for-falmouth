@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: a2311d08deb614b749e02aaf77df1b82
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - atmoShader: {fileID: 7200000, guid: a9117039e803348e1bcb2cbd1e21d46a, type: 3}
+  - vectorShader: {fileID: 7200000, guid: 269e238d35b144c1e907159293dcb37a, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,57 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+struct GravOpDat
+{
+    float3 object;
+
+    float mass;
+
+    float strength;
+};
+
+//in
+RWStructuredBuffer<GravOpDat> Inputs;
+
+int InputLen;
+float DeltaTime;
+
+//out
+RWStructuredBuffer<float3> Result;
+
+float GetGravitationalPull(float subjectMass, float targetMass, float targetStrength, float distance)
+{
+    return (subjectMass * targetMass) / ((distance * distance) * targetStrength);
+}
+
+[numthreads(1,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x == id.y)
+    {
+        Result[id.x * InputLen + id.y] = float3(0, 0, 0);
+
+        return;
+    }
+
+    // get distance
+
+    float dist = distance(Inputs[id.y].object, Inputs[id.x].object);
+
+    if (dist < 0)
+    {
+        dist = -dist;
+    }
+
+    // get gravity
+
+    float gravity = GetGravitationalPull(Inputs[id.x].mass, Inputs[id.y].mass, Inputs[id.x].strength, dist);
+
+    // align gravity
+
+    float3 gravityAlign = ((normalize(Inputs[id.y].object - Inputs[id.x].object))) * (gravity * DeltaTime);
+
+    // return!!!
+
+    Result[id.x * InputLen + id.y] = gravityAlign;
+}
