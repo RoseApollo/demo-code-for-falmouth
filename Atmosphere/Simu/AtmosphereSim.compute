@@ -68,16 +68,6 @@ float Clamp(float v, float min, float max)
     return v;
 }
 
-float BPow(float a, float b)
-{
-    if (a < 0)
-    {
-        return -pow(-a, b);
-    }
-
-    return pow(a, b);
-}
-
 bool VectorsEqual(float3 a, float3 b)
 {
     if (a.x == b.x)
