@@ -23,7 +23,7 @@ public class AtmosphereSim : MonoBehaviour
     void FixedUpdate()
     {
         if (_p1Shader == null || _p2Shader == null)
-            throw new System.Exception("FUCKING SHADER SHOULD FUCK YOU OMG I HAE YOU SO FUCKING MUCH");
+            throw new System.Exception("Shader could not be found");
 
         if (Atmosphere.atmospheres.Count <= 0 || AtmosphereEffect.atmosphereEffects.Count <= 0)
             return;
